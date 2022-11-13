@@ -2,154 +2,211 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'constants.dart';
+
 void main() => runApp(const MyApp());
 
-const Color darkBlue = Color(0xff061526);
-const Color neonblue = Color(0xff01F2E8);
-const double width = 340;
+const double width = 320;
 const double height = 450;
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
+      home: const SignInScreen(),
+    );
+  }
 }
 
-// final FocusNode focusNode = FocusNode();
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({Key? key}) : super(key: key);
 
-class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    );
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4));
     _animation = Tween<double>(begin: 0, end: 2 * pi).animate(_controller)
-      ..addListener(() {
-        setState(() {});
-      });
+      ..addListener(() => setState(() {}));
     _controller.repeat();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Material App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: darkBlue,
-      ),
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: darkBlue,
-        body: Center(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: width,
-                  height: height,
-                  decoration: BoxDecoration(
-                    color: darkBlue,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0B233B).withOpacity(0.15),
-                        blurRadius: 15,
-                        offset: const Offset(-10, -10),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 20,
-                        offset: const Offset(15, 15),
-                      ),
-                    ],
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: darkBlue,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Image(
+                  image: AssetImage(logo),
+                  width: 50,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Flutter Guys',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
                   ),
-                ),
-                Positioned(
-                  top: height / 2,
-                  left: width / 2,
-                  child: AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, _) {
-                        return Transform.rotate(
-                          angle: _animation.value,
-                          alignment: Alignment.topLeft,
-                          child: Container(
-                            width: width,
-                            height: height,
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.transparent,
-                                  neonblue,
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-                Positioned(
-                  bottom: height / 2,
-                  right: width / 2,
-                  child: AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, _) {
-                        return Transform.rotate(
-                          angle: _animation.value,
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            width: width,
-                            height: height,
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  neonblue,
-                                  Colors.transparent,
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  child: Container(
+                )
+              ],
+            ),
+            const SizedBox(height: 30),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: width,
+                    height: height,
+                    decoration: BoxDecoration(
+                      color: darkBlue,
+                      boxShadow: [blackShadow],
+                    ),
+                  ),
+                  Positioned(
+                    top: height / 2,
+                    left: width / 2,
+                    child: NeonBackgroundContainer(
+                      controller: _controller,
+                      animation: _animation,
+                      alignment: Alignment.topLeft,
+                      colors: const <Color>[Colors.transparent, neonblue],
+                    ),
+                  ),
+                  Positioned(
+                      bottom: height / 2,
+                      right: width / 2,
+                      child: NeonBackgroundContainer(
+                        controller: _controller,
+                        animation: _animation,
+                        alignment: Alignment.bottomRight,
+                        colors: const <Color>[neonblue, Colors.transparent],
+                      )),
+                  Container(
                     padding: const EdgeInsets.all(20),
                     width: width - 10,
                     height: height - 10,
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Color.fromARGB(255, 7, 25, 44),
+                      color: lightDarkBlue,
                     ),
-                    child: const LoginForm(),
+                    child: const SignInForm(),
                   ),
-                ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+            const Text(
+              'Or sign in with',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                OtherSignInOption(google),
+                OtherSignInOption(facebook),
+                OtherSignInOption(apple),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class LoginForm extends StatelessWidget {
-  const LoginForm({super.key});
+class OtherSignInOption extends StatelessWidget {
+  const OtherSignInOption(
+    this.name, {
+    Key? key,
+  }) : super(key: key);
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: lightDarkBlue,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [blackShadow],
+      ),
+      child: Image(
+        image: AssetImage(name),
+        width: 30,
+      ),
+    );
+  }
+}
+
+class NeonBackgroundContainer extends StatelessWidget {
+  const NeonBackgroundContainer({
+    Key? key,
+    required AnimationController controller,
+    required Animation<double> animation,
+    required this.alignment,
+    required this.colors,
+  })  : _controller = controller,
+        _animation = animation,
+        super(key: key);
+
+  final AnimationController _controller;
+  final Animation<double> _animation;
+  final Alignment alignment;
+  final List<Color> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return Transform.rotate(
+            angle: _animation.value,
+            alignment: alignment,
+            child: Container(
+              width: width,
+              height: height,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: colors,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+          );
+        });
+  }
+}
+
+class SignInForm extends StatelessWidget {
+  const SignInForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +248,7 @@ class LoginForm extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
           ),
           child: const Text(
-            'Login',
+            'Sign in',
             style: TextStyle(
               color: darkBlue,
               fontSize: 14,
@@ -207,7 +264,6 @@ class LoginForm extends StatelessWidget {
             Text(
               'Don\'t have an account? ',
               style: TextStyle(
-                color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 1,
@@ -216,10 +272,10 @@ class LoginForm extends StatelessWidget {
             Text(
               'Sign up',
               style: TextStyle(
-                color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 1,
+                decoration: TextDecoration.underline,
               ),
             ),
           ],
@@ -255,22 +311,20 @@ class CustonTextField extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Flexible(
-            child: TextField(
-              style: TextStyle(
-                color: darkBlue,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 1,
-              ),
-              cursorColor: darkBlue,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                filled: true,
-                fillColor: neonblue,
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderSide: BorderSide.none),
-              ),
+          const TextField(
+            style: TextStyle(
+              color: darkBlue,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+            cursorColor: darkBlue,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+              filled: true,
+              fillColor: neonblue,
+              enabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide.none),
             ),
           ),
         ],
